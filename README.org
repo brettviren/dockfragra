@@ -1,0 +1,40 @@
+Docker for LBNE
+
+* This Package
+
+This package builds Docker containers for use in building LBNE
+software.  
+
+For each supported GNU/Linux distribution there is a =Dockerfile=.  It
+is layered like:
+
+- base OS
+- OS-level prerequisites
+- [[https://github.com/brettviren/worch][Worch]] build system and [[https://github.com/LBNE/lbne-build][lbne-build]] configuration
+- LBNE software produced by running the above
+
+
+
+
+
+* Creating a base image
+
+The base image is created like:
+
+#+BEGIN_EXAMPLE
+  $ docker build -t "fedora-20" fedora/20
+  Sending build context to Docker daemon 3.584 kB
+  Sending build context to Docker daemon 
+  Step 0 : FROM fedora:20
+   ---> 2e613b1df961
+  Step 1 : MAINTAINER Brett Viren <bv@bnl.gov>
+   ---> Using cache
+   ---> b6c489ad96a6
+  Step 2 : RUN yum -y install python-virtualenv git gcc-c++ m4 subversion patch automake flex                   ncurses-devel zlib-devel libtool bzip2-devel                   libX11-devel libXmu-devel libXpm-devel libXft-devel                   mesa-libGL-devel mesa-libGLU-devel                   doxygen-latex tcl-devel                   libtool libbz2-dev libreadline-dev automake                   expat-devl readline-devel krb5-devel
+   ---> Using cache
+   ---> ddbe8e46eeea
+  Successfully built ddbe8e46eeea
+#+END_EXAMPLE
+
+* Doing a build of LBNE software
+
