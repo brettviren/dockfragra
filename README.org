@@ -13,16 +13,44 @@ is layered like:
 - [[https://github.com/brettviren/worch][Worch]] build system and [[https://github.com/LBNE/lbne-build][lbne-build]] configuration
 - LBNE software produced by running the above
 
+* Docker
 
+** Debian/Ubuntu:
 
+#+BEGIN_EXAMPLE
+  $ sudo apt-get install docker.io
+  $ sudo adduser <username> docker
+#+END_EXAMPLE
 
+NB: probably you must log out/in to make that =adduser= command take effect. 
+
+This stores data in /var/lib.  If that partition is not big enough (multi-GB) then move Docker's directory:
+
+#+BEGIN_EXAMPLE
+  $ sudo /bin/bash
+  # service docker.io stop
+  # mkdir -p /data0/sys/var/lib
+  # mv /var/lib/docker /data0/sys/var/lib/
+  # ln -s /data0/sys/var/lib/docker /var/lib/
+  # service docker.io start
+#+END_EXAMPLE
+
+** Life behind a firewall
+
+*** Proxy
+Sites needing to use an ftp/http proxy can edit =/etc/default/docker.io= (Deb/Ubu) and set the necessary =export= lines, then =sudo service docker.io restart=.  This will now allow commands like =docker pull= to work.  However, running inside the container does not inherit this and so =ENV= statements must be put in the Dockerfile.
+
+*** DNS
+
+Set =--dns= options in =/etc/default/docker.io=.
 
 * Creating a base image
 
 The base image is created like:
 
 #+BEGIN_EXAMPLE
-  $ docker build -t "fedora-20" fedora/20
+  $ cd lbne-docker
+  $ docker build -t "fedora-20" base/fedora/20
   Sending build context to Docker daemon 3.584 kB
   Sending build context to Docker daemon 
   Step 0 : FROM fedora:20
@@ -30,11 +58,33 @@ The base image is created like:
   Step 1 : MAINTAINER Brett Viren <bv@bnl.gov>
    ---> Using cache
    ---> b6c489ad96a6
-  Step 2 : RUN yum -y install python-virtualenv git gcc-c++ m4 subversion patch automake flex                   ncurses-devel zlib-devel libtool bzip2-devel                   libX11-devel libXmu-devel libXpm-devel libXft-devel                   mesa-libGL-devel mesa-libGLU-devel                   doxygen-latex tcl-devel                   libtool libbz2-dev libreadline-dev automake                   expat-devl readline-devel krb5-devel
-   ---> Using cache
-   ---> ddbe8e46eeea
+  ...[Dockerfile-dependent output snipped]...
   Successfully built ddbe8e46eeea
+
 #+END_EXAMPLE
+
+If fail:
+
+#+BEGIN_EXAMPLE
+  $ docker images
+  REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+  <none>              <none>              0900235f5611        8 minutes ago       374.1 MB
+  fedora              20                  2e613b1df961        9 days ago          374.1 MB
+  $ docker run -t -i 0900235f5611 /bin/bash
+  (mess about)
+#+END_EXAMPLE
+
 
 * Doing a build of LBNE software
 
+#+BEGIN_EXAMPLE
+  $ docker build -t "fedora-20-lbne" build/fedora/20
+#+END_EXAMPLE
+
+This will actually progressively run more of the build as separate
+commands.  Each one targeting an addition =waf= "group".  These groups
+are built in a serial fashion anyways so there is no loss of
+efficiency.  By building them explicitly as separate Docker-level
+=RUN= commands it allows for Docker to "checkpoint" intermediate
+successes and this makes any failures faster to reproduce and debug
+interactively.
