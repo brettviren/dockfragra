@@ -2,89 +2,47 @@ Docker for LBNE
 
 * This Package
 
-This package builds Docker containers for use in building LBNE
-software.  
+This package builds Docker containers and through them builds LBNE
+software.  Some more details are at:
 
-For each supported GNU/Linux distribution there is a =Dockerfile=.  It
-is layered like:
+https://lbne.bnl.gov/wiki/Building_in_Docker
 
-- base OS
-- OS-level prerequisites
-- [[https://github.com/brettviren/worch][Worch]] build system and [[https://github.com/LBNE/lbne-build][lbne-build]] configuration
-- LBNE software produced by running the above
+* Installation
 
-* Docker
+** Docker
 
-** Debian/Ubuntu:
+See Docker's own installation instructions for your platform for details.  
 
-#+BEGIN_EXAMPLE
-  $ sudo apt-get install docker.io
-  $ sudo adduser <username> docker
-#+END_EXAMPLE
+This package assumes the native host user has correct permissions.
 
-NB: probably you must log out/in to make that =adduser= command take effect. 
+** Python Modules
 
-This stores data in /var/lib.  If that partition is not big enough (multi-GB) then move Docker's directory:
+This package drives Docker via python.  For now, you must install things manually.
 
 #+BEGIN_EXAMPLE
-  $ sudo /bin/bash
-  # service docker.io stop
-  # mkdir -p /data0/sys/var/lib
-  # mv /var/lib/docker /data0/sys/var/lib/
-  # ln -s /data0/sys/var/lib/docker /var/lib/
-  # service docker.io start
+  $ virtualenv venv
+  $ source venv/bin/activate
+  $ pip install docker-py=0.5.3
+  $ pip install docker-map
+  $ pip install click
 #+END_EXAMPLE
+
+Note, it's important for now to explicitly install =docker-py= version 0.5.3, at least when running on an Ubuntu 14.04 host. 
+
+* Configuration
+
+See [[./lbne-docker.cfg]].  The LBNE wiki link has some background info.
+
+* Use
+
+#+BEGIN_EXAMPLE
+  $ python lbne-docker.py lbne-0.5.1-fedora-20-1
+#+END_EXAMPLE
+
+* Environment
+
+The "environment" (using the language from the LBNE wiki page) is handled by hacking on [[./dot.profile]].  
 
 ** Life behind a firewall
 
-*** Proxy
-Sites needing to use an ftp/http proxy can edit =/etc/default/docker.io= (Deb/Ubu) and set the necessary =export= lines, then =sudo service docker.io restart=.  This will now allow commands like =docker pull= to work.  However, running inside the container does not inherit this and so =ENV= statements must be put in the Dockerfile.
-
-*** DNS
-
-Set =--dns= options in =/etc/default/docker.io=.
-
-* Creating a base image
-
-The base image is created like:
-
-#+BEGIN_EXAMPLE
-  $ cd lbne-docker
-  $ docker build -t "fedora-20" base/fedora/20
-  Sending build context to Docker daemon 3.584 kB
-  Sending build context to Docker daemon 
-  Step 0 : FROM fedora:20
-   ---> 2e613b1df961
-  Step 1 : MAINTAINER Brett Viren <bv@bnl.gov>
-   ---> Using cache
-   ---> b6c489ad96a6
-  ...[Dockerfile-dependent output snipped]...
-  Successfully built ddbe8e46eeea
-
-#+END_EXAMPLE
-
-If fail:
-
-#+BEGIN_EXAMPLE
-  $ docker images
-  REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
-  <none>              <none>              0900235f5611        8 minutes ago       374.1 MB
-  fedora              20                  2e613b1df961        9 days ago          374.1 MB
-  $ docker run -t -i 0900235f5611 /bin/bash
-  (mess about)
-#+END_EXAMPLE
-
-
-* Doing a build of LBNE software
-
-#+BEGIN_EXAMPLE
-  $ docker build -t "fedora-20-lbne" build/fedora/20
-#+END_EXAMPLE
-
-This will actually progressively run more of the build as separate
-commands.  Each one targeting an addition =waf= "group".  These groups
-are built in a serial fashion anyways so there is no loss of
-efficiency.  By building them explicitly as separate Docker-level
-=RUN= commands it allows for Docker to "checkpoint" intermediate
-successes and this makes any failures faster to reproduce and debug
-interactively.
+If you live behind a firewall you may need to explicitly set the DNS for Docker to use and maybe also set HTTP or FTP proxy variables.  For Docker itself add  =--dns=  and =export= entries to =/etc/default/docker.io= and restart the daemon.  You may further need to edit the [[./dot.profile]] file to set any environment variables.   Do so by keying off the DNS settings.
