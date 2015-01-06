@@ -66,6 +66,10 @@ def do_build(imagename, url, maintainer, **kwds):
             df.run("bash -l -c 'waf --prefix=install --orch-config=lbne/suite-%s.cfg configure build'" % suite)
             df.run("touch built-suite-%s" % suite) # just a marker
 
+        ups_products_dir = kwds.get('ups_products_dir')
+        if ups_products_dir:
+            df.run("bash -l -c 'urman -z %s init'" % ups_products_dir)
+            df.run("for p in tmp/upspack/*.tar.bz2; do echo $p; tar -C %s -xf $p; done" % ups_products_dir)
         client.build_from_file(df, imagename)
 
     return
@@ -77,10 +81,12 @@ def do_build(imagename, url, maintainer, **kwds):
               help='Set the URL to the docker daemon')
 @click.option('-m','--maintainer', default='Brett Viren <bv@bnl.gov>',
               help='Set identifier of the maintainer')
+@click.option('--ups-products-dir', default=None,
+              help='Set to a directory in the Docker container into which the build results will be installed as UPS products')
 @click.argument('build')
-def doit(config, url, maintainer, build):
+def doit(config, url, maintainer, build, ups_products_dir):
     cfg = parse_config_section(config, build)
-    do_build(build, url, maintainer, **cfg)
+    do_build(build, url, maintainer, ups_products_dir=ups_products_dir, **cfg)
 
 
 if '__main__' == __name__:
