@@ -36,8 +36,16 @@ See [[./lbne-docker.cfg]].  The LBNE wiki link has some background info.
 * Use
 
 #+BEGIN_EXAMPLE
-  $ python lbne-docker.py lbne-0.5.1-fedora-20-1
+  $ python lbne-docker.py [--ups-products-dir products] lbne-0.5.1-fedora-20-1
 #+END_EXAMPLE
+
+Note: the support for UPS packages/products shown there is ongoing as part of the [[https://github.com/LBNE/lbne-build][lbne-build]] project.
+
+* Areas of ongoing and future work
+
+- mount directory external to Docker container to "catch" results
+- integrate with Jenkins @ FNAL
+- make use of [[https://hub.docker.com][Docker Hub]] to build containers based on commits to GitHub?
 
 * Environment
 
