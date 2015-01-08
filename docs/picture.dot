@@ -1,0 +1,84 @@
+digraph Picture {
+
+	jessie[label="Debian 7.7"];
+	trusty[label="Ubuntu 14.04"];
+	fc20[label="Fedora 20"];
+	sl6[label="Scientific 6"];
+	{rank=same; jessie trusty fc20 sl6};
+
+	apt[label="apt-get install", shape=diamond,width=1,height=1];
+	yum[label="yum install", shape=diamond,width=1,height=1];
+
+	prereq[label="prerequisites"];
+
+	adduser[label="adduser lbne", shape=diamond,width=1,height=1];
+
+	userready[label="user ready"];
+
+	tar[label="pip install lbne-build-X.Y.Z-rcN-tar.gz\n(release candidate)", shape=diamond,width=1,height=1];
+	pip[label="pip install lbne-build=X.Y.Z\n(official release)", shape=diamond,width=1,height=1];
+	git[label="git clone && python setup.py && pip install\n(development)", shape=diamond,width=1,height=1];	
+	{rank=same; tar pip git}
+
+	buildready[label="ready for build"];
+
+	waf_buildtools[label="waf suite-buildtools.cfg", shape=diamond,width=1,height=1];
+	buildtools[label="buildtools built"];
+	test_buildtools[label="test_buildtools.sh", shape=diamond,width=1,height=1];
+	buildtools_tested[label="buildtools tested"];
+
+	waf_compiler[label="waf suite-compiler.cfg", shape=diamond,width=1,height=1];
+	compiler[label="compiler built"];
+	test_compiler[label="test_compiler.sh", shape=diamond,width=1,height=1];
+	compiler_tested[label="compiler tested"];
+	
+	waf_externals[label="waf suite-externals.cfg", shape=diamond,width=1,height=1];
+	externals[label="externals built"];
+	test_externals[label="test_externals.sh", shape=diamond,width=1,height=1];
+	externals_tested[label="externals tested"]
+
+	waf_art[label="waf suite-art.cfg", shape=diamond,width=1,height=1];
+	art[label="art built"];
+	test_art[label="test_art.sh", shape=diamond,width=1,height=1];
+	art_tested[label="art tested"];
+
+	waf_larsoft[label="waf suite-larsoft.cfg", shape=diamond,width=1,height=1];
+	larsoft[label="larsoft built"];
+	test_larsoft[label="test_larsoft.sh", shape=diamond,width=1,height=1];
+	larsoft_tested[label="larsoft tested"];
+
+	{rank=same; test_buildtools, waf_compiler}
+	{rank=same; test_compiler, waf_externals}
+	{rank=same; test_externals, waf_art}
+	{rank=same; test_art, waf_larsoft}
+
+	{rank=same; buildtools_tested, compiler}
+	{rank=same; compiler_tested, externals}
+	{rank=same; externals_tested, art}
+	{rank=same; art_tested, larsoft}
+
+	jessie->apt;
+	trusty->apt;
+	apt->prereq[style=dashed];
+	fc20->yum;
+	sl6->yum;
+	yum->prereq[style=dashed];
+	
+
+	prereq->adduser->userready;
+
+	userready->tar;
+	userready->pip;	
+	userready->git;
+
+	tar->buildready[style=dashed];
+	pip->buildready[style=dashed];	
+	git->buildready[style=dashed];
+
+	buildready->waf_buildtools->buildtools->waf_compiler->compiler->waf_externals->externals->waf_art->art->waf_larsoft->larsoft;
+	buildtools->test_buildtools->buildtools_tested[constraint=false];
+	compiler->test_compiler->compiler_tested[constraint=false];
+	externals->test_externals->externals_tested[constraint=false];
+	art->test_art->art_tested[constraint=false];
+	larsoft->test_larsoft->larsoft_tested;
+	}

@@ -1,0 +1,61 @@
+#+TITLE: Using this package to make a release.
+
+* Overview
+
+1) Follow git-flow patterns to make a release branch.
+
+2) Before finishing the release, make =X.Y.Z-rcN= release candidates and test
+
+3) Make a new =lbne-docker= configuration file based on the existing [[../lbne-docker.cfg]] using the =rcN= tag
+
+4) Run =lbne-docker.py= on it.
+
+5) Fix any problems
+
+6) Finish the release branch 
+
+* Verbose
+
+** Start release
+
+Follow git-flow patterns to make a release branch.
+
+#+BEGIN_EXAMPLE
+  $ git clone git@github.com:LBNE/lbne-build.git lbne-build-0.6.0
+  $ cd lbne-build-0.6.0
+  $ git flow init -d
+  $ gitk --all
+
+  # merge any desired feature branches into develop
+  $ git checkout develop
+  $ git merge origin/gcc491-build
+
+  $ git flow release start 0.6.0
+#+END_EXAMPLE
+
+** Make release candidate
+
+Before finishing the release, make =X.Y.Z-rcN= release candidates and test
+
+#+BEGIN_EXAMPLE
+  $ emacs setup.py         # change the version to 0.6.0-rc1
+  $ python setup.py sdist
+#+END_EXAMPLE
+
+** Test =lbne-docker= config
+
+#+BEGIN_EXAMPLE
+  $ cd lbne-docker
+
+#+END_EXAMPLE
+
+
+3) Make a new =lbne-docker= configuration file based on the existing [[../lbne-docker.cfg]] using the =rcN= tag
+
+4) Run =lbne-docker.py= on it.
+
+5) Fix any problems
+
+6) Finish the release branch 
+
+

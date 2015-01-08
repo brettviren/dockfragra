@@ -1,0 +1,11 @@
+#+TITLE: Using =lbne-docker= to advance =lbne-build=
+
+* Why
+
+The =lbne-build= package holds the instructions to build the LBNE
+software stack.  It would be nice to develop it in a way that it can
+be tested in an ad-hoc way but on well characterized platforms.  It
+would also be nice to not have to wait for unchanged parts to be built
+up.  For example, if a new release leaves all the externals untouched,
+we could reuse a previously built image.
+
