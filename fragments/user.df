@@ -1,7 +1,7 @@
-RUN 'useradd -c "Software Installer" -d /home/{install_user} -m -s /bin/bash {install_user}')
+RUN useradd -c "Software Installer" -d /home/{install_user} -m -s /bin/bash {install_user}
 USER {install_user}
 WORKDIR /home/{install_user}
 ENV HOME /home/{install_user}
 RUN rm -f /home/{install_user}/.bash*
-ADD {host_dir}/dot.profile /home/{install_user}/.bash_profile
+ADD dot.profile /home/{install_user}/.bash_profile
 RUN virtualenv venv
