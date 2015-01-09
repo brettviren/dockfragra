@@ -2,22 +2,29 @@ Docker for LBNE
 
 * This Package
 
-This package builds Docker containers and through them builds LBNE
-software.  Some more details are at:
+This package builds LBNE software stacks starting from nothing, literally.  
 
+It is used to drive Docker through the steps of installing a base-OS, installing all additional required OS-level packages, creating an installation account and, in that, exercising the LBNE build system based on [[https://github.com/brettviren/worch][Worch]] to build compiler, external packages, framework and LBNE experiment software itself.
+
+For some background and rationale for this package, see the wiki page:
+
+#+BEGIN_QUOTE
 https://lbne.bnl.gov/wiki/Building_in_Docker
+#+END_QUOTE
+
+For some design notes/descriptions see [[./docs/big-picture.org]].
+
+Despite "LBNE" in the name, the underlying tool, =graph-docker.py= is general-purpose.  All LBNE-specific parts are kept to the configuration file and the Dockerfile fragments.
 
 * Installation
 
 ** Docker
 
-See Docker's own installation instructions for your platform for details.  
-
-This package assumes the native host user has correct permissions.
+See Docker's own installation instructions for your platform for details.  See [[Environment]] for help on possible problems that your particular environment may pose.
 
 ** Python Modules
 
-This package drives Docker via python.  For now, you must install things manually.
+This package drives Docker via Python but is not yet packaged.  So, for now, you must install things manually.
 
 #+BEGIN_EXAMPLE
   $ virtualenv venv
@@ -25,21 +32,20 @@ This package drives Docker via python.  For now, you must install things manuall
   $ pip install docker-py=0.5.3
   $ pip install docker-map
   $ pip install click
+  $ pip install networkx
 #+END_EXAMPLE
 
-Note, it's important for now to explicitly install =docker-py= version 0.5.3, at least when running on an Ubuntu 14.04 host. 
+Note, it's important, for now, to explicitly install =docker-py= version 0.5.3, at least when running on an Ubuntu 14.04 host. It seems that a newer but broken version (0.7) has been uploaded to PyPI.
 
 * Configuration
 
-See [[./lbne-docker.cfg]].  The LBNE wiki link has some background info.
+See [[./graph-docker.cfg]] and the Dockerfile fragments under [[./fragments/]].  More information is in [[./docs/configuration.org]].
 
 * Use
 
 #+BEGIN_EXAMPLE
-  $ python lbne-docker.py [--ups-products-dir products] lbne-0.5.1-fedora-20-1
+  $ python graph-docker.py [options] <configuration-section>
 #+END_EXAMPLE
-
-Note: the support for UPS packages/products shown there is ongoing as part of the [[https://github.com/LBNE/lbne-build][lbne-build]] project.
 
 * Areas of ongoing and future work
 
@@ -49,8 +55,26 @@ Note: the support for UPS packages/products shown there is ongoing as part of th
 
 * Environment
 
-The "environment" (using the language from the LBNE wiki page) is handled by hacking on [[./dot.profile]].  
+In principle, this package should "just work" for all sites since it relies on Docker to abstract away local host issues in a way that should be well tested.  However there are some things that may cause problems:
 
-** Life behind a firewall
+** Permissions
 
-If you live behind a firewall you may need to explicitly set the DNS for Docker to use and maybe also set HTTP or FTP proxy variables.  For Docker itself add  =--dns=  and =export= entries to =/etc/default/docker.io= and restart the daemon.  You may further need to edit the [[./dot.profile]] file to set any environment variables.   Do so by keying off the DNS settings.
+This package is developed assuming a non-privileged (host) user has permissions to access the Docker daemon.  No testing has been done running with full superuser privileges.
+
+
+** DNS
+
+By default, Docker will try to use Google DNS servers (8.8.8.8).  If your site blocks outbound DNS queries this will cause pretty much everything that uses the network to fail.  To fix this you must instruct the Docker daemon to use your site's DNS server. 
+
+On Debian-based systems do this by editing =/etc/default/docker.io= and adding a =--dns= entry.
+
+** Network proxy
+
+If your local network blocks output HTTP or FTP and requires an explicit proxy then the Docker daemon and the installation procedure that runs inside Docker containers will not be able to download anything.  
+
+To configure the daemon on Debian-based systems, edit =/etc/default/docker.io= and add the usual environment variables that define web proxy URLs (=http_proxy=, etc) and =export= them.  
+
+To configure the container environment, provide a [[./dot.profile]] that sets whatever environment is needed for a user to operate on your network.
+
+
+
