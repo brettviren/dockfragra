@@ -1,0 +1,80 @@
+#+TITLE: Configuration
+
+This document describes how to configure =graph-docker.py=.
+
+* Overview
+
+To exercise this package one needs:
+
+ - the =graph-docker.py= script
+ - a =graph-docker.cfg= file
+ - some number of Dockerfile fragments
+
+The =graph-docker.py= file runs on the configuration file and creates a workflow consisting of the application of =docker build= commands on the Dockerfile fragments.
+
+* The configuration file
+
+The overall processing is driven by a section in a =graph-docker.cfg= file, or as specified on the command line with:
+
+#+BEGIN_EXAMPLE
+  group-docker.py -c <config>
+#+END_EXAMPLE
+
+This configuration may contain a number of named sections of key/value pairs.  The section name determines the final Docker image name and is used as a basis to name intermediate images.
+
+** Define the workflow
+
+The main-line workflow is defined by specifying a base =platform= plus a list of steps in the =workflow= configuration item.  For example:
+
+#+BEGIN_EXAMPLE
+  [lbne-0.5.1-debian-7.7-1]
+  platform: debian:7.7
+  workflow: prereq, user, release, buildtools compiler externals larsoft
+  ...
+#+END_EXAMPLE
+
+Each main-line image may have an optional validation step.  To specify
+which images should be tested one provides a =validate= keyword.  For
+example:
+
+#+BEGIN_EXAMPLE
+  [lbne-0.5.1-debian-7.7-1]
+  ...
+  validate: buildtools compiler externals larsoft
+#+END_EXAMPLE
+
+Each step, be it mainline or validation, must have a corresponding
+Dockerfile fragment written to the files matching this pattern:
+
+#+BEGIN_EXAMPLE
+  fragments/<STEP>.df
+#+END_EXAMPLE
+
+Then, the application of each step creates a new image named by appending
+the step name to the base name.
+
+#+BEGIN_EXAMPLE
+  $ docker images
+  lbne-0.5.1-debian-7.7-1_larsoft-tested    latest  a4c07c90c1d9  50 minutes ago    23.52 GB
+  lbne-0.5.1-debian-7.7-1_larsoft           latest  447abeffe62e  51 minutes ago    23.52 GB
+  lbne-0.5.1-debian-7.7-1_externals-tested  latest  72aebc4d8113  About an hour ago 19.63 GB
+  lbne-0.5.1-debian-7.7-1_externals         latest  401fdc5c7f62  About an hour ago 19.63 GB
+  lbne-0.5.1-debian-7.7-1_compiler-tested   latest  d88ac3a5f610  2 hours ago       6.797 GB
+  ...
+#+END_EXAMPLE
+
+
+* Dockerfile fragments
+
+A Dockerfile fragment file is a Dockerfile that does not have the =FROM= nor =MAINTAINER= lines.  These can be set on the =graph-docker.py= command line and are then shared across all Dockerfiles.
+
+** Configuration parameters 
+
+Any number of additional key/value pairs may be added to a configuration section.  Some additional parameters are defined by the =graph-docker.py= script.  These are all then available for expansion in the Dockerfile fragment files.  For example, =graph-docker.py= defines the =os_package_install= parameter to hold the command needed to install OS-level packages for the targeted =platform=.  If a configuration file then defines =packages= to hold a list of packages then a Dockerfile fragment that will install these packages on all supported platforms would look like:
+
+#+BEGIN_EXAMPLE
+RUN {os_package_install} {packages}
+#+END_EXAMPLE
+
+As can be seen, macro expansion is performed on any key name bracketed by "={}=".
+
