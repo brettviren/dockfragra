@@ -1,1 +1,6 @@
 RUN ls -l install/cmake
+RUN ./install/cmake/3.0.2/bin/cmake --version
+RUN ./install/cmake/3.0.2/bin/cmake --help
+RUN bash -l -c 'urman -z products init'
+RUN bash -l -c 'for n in tmp/upspack/*.tar.bz2 ; do echo $n; tar -C products -xf $n; done'
+RUN bash -l -c 'source products/setups && setup cmake v3_0_2 && cmake --version'

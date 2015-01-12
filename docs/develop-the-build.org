@@ -2,10 +2,42 @@
 
 * Why
 
-The =lbne-build= package holds the instructions to build the LBNE
-software stack.  It would be nice to develop it in a way that it can
-be tested in an ad-hoc way but on well characterized platforms.  It
-would also be nice to not have to wait for unchanged parts to be built
-up.  For example, if a new release leaves all the externals untouched,
-we could reuse a previously built image.
+The =lbne-build= package holds the instructions to build the LBNE software stack.  It would be nice to develop it in a way that it can be tested in an ad-hoc way but on well characterized platforms.  It would also be nice to not have to wait for unchanged parts to be built up.  For example, if a new release leaves all the externals untouched, we could reuse a previously built image.  In addition, while doing a build that should succeed, often it doesn't.  One would like to enter at the failure point to do some interactive hacking, and maybe even fix things.
 
+
+* Explicit develop
+
+** Configuration
+
+The main part of developing =lbne-build= in side of an =lbne-docker= container is getting a development version of =lbne-build= in place instead of the nominal release version from PyPI.  In short, one does this by replacing the "=release=" step with a different "=devel=" step that sets this up.
+
+Start by editing [[../graph-docker.cfg]] and:
+
+1) copy a similar section and give it a new name, eg by prefixing it's build number by "=dev="
+2) replace the =build= keyword with a =github= one that names the =https://= git URL for =lbne-build=, most like https://github.com/LBNE/lbne-build.git.  Don't use one requiring SSH keys.
+3) replace "=release=" step in both "=workflow=", and if it exists or is wanted, in "=validate=" with "=devel=" (or your desired step name).
+4) add =gituser= and =gitemail=
+5) if not using the standard "fragments/devel.df", write one.
+
+If you intend to commit these changes to =lbne-docker= respect the things that are there and do not break them.
+
+** Building
+
+Build development images the same way as release ones.  Just refer to the name of the development configuration section.
+
+#+BEGIN_EXAMPLE
+  $ python graph-docker.py lbne-0.5.1-fedora-21-dev1
+#+END_EXAMPLE
+
+** Caching
+
+Beware of caching when re-running a build after tweaking something.  Docker does not know when external things change.  In particular if the Dockerfile has a line "=git clone=" and you have pushed commits between "=docker builds=" Docker will happily reuse the cached image from the first time "=git clone=" was run.
+
+** Attaching
+
+If a step fails you may be able to attach to it in order to poke aroundinteractively.  Try to locate the /container/ ID (not image ID!) by finding the particular command that last ran:
+
+#+BEGIN_EXAMPLE
+  $ docker ps -a [--no-trunc]
+  $ 
+#+END_EXAMPLE

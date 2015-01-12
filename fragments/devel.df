@@ -1,0 +1,19 @@
+USER root
+# fixme: move into prereq.df
+RUN yum install -y gitflow
+USER lbne
+
+RUN git config --global user.name "{gituser}"
+RUN git config --global user.email "{gitemail}"
+
+RUN git clone https://github.com/brettviren/worch-ups.git
+RUN bash -l -c 'cd worch-ups && python setup.py sdist'
+RUN bash -l -c 'pip install worch-ups/dist/worch-ups-*.tar.gz'
+
+RUN git clone {giturl}
+RUN cd lbne-build && git remote add github git@github.com:LBNE/lbne-build.git
+RUN bash -l -c 'cd lbne-build && git checkout develop && python setup.py sdist'
+RUN bash -l -c 'pip install lbne-build/dist/lbne-build-*.tar.gz'
+
+RUN cp venv/share/worch/wscripts/lbne/wscript .
+RUN ls -lR venv/share/worch
