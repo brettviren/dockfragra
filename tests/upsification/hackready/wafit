@@ -1,0 +1,7 @@
+#!/bin/bash -l
+
+if [ -z "$1" ] ; then
+    waf
+else
+    waf --prefix=install --orch-config=lbne/suite-${1}.cfg configure build
+fi

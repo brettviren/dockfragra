@@ -41,3 +41,14 @@ If a step fails you may be able to attach to it in order to poke aroundinteracti
   $ docker ps -a [--no-trunc]
   $ 
 #+END_EXAMPLE
+
+* Attach
+
+From http://jpetazzo.github.io/2014/06/23/docker-ssh-considered-evil/
+
+#+BEGIN_EXAMPLE
+# Starting the service
+CID=$(docker run -d -v /var/run fooservice)
+# Restarting the service with a sidekick container
+docker run --volumes-from $CID fooservice fooctl restart
+#+END_EXAMPLE

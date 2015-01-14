@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+
+import os
+import re
+import sys
+import subprocess
+
+
+def upscmd(cmdstr, driver=None):
+    cmdlist = list()
+    cmdlist += ['_=""']
+    cmdlist += [os.path.expandvars("source $HOME/products/setups")]
+    if driver:
+        cmdlist += ['setup %s %s -q %s' % get_pkg_setup(driver)]
+    cmdlist += [cmdstr]
+    cmdline = ' && '.join(cmdlist)
+    return subprocess.check_output(cmdline, shell='/bin/bash')
+
+def get_pkg_setup(pkg):
+    for line in upscmd("ups list -aK+").split('\n'):
+        line = line.strip()
+        if not line: continue
+        chunks = [x.strip() for x in line.split('"') if x.strip()]
+        if not chunks: continue
+        if chunks[0] == pkg:
+            return chunks[0], chunks[1], chunks[3]
+    return
+
+def main():
+    driver=sys.argv[1]
+    cmd = ' '.join(sys.argv[2:])
+    print upscmd(cmd, driver)
+
+if '__main__' == __name__:
+    main()
+
