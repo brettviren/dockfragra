@@ -2,14 +2,23 @@
 
 # do some checks to make sure I didn't forget to do something
 
-cd $HOME/lbne-build
+for maybe in ['worch','worch-ups','lbne-build']
+do
+    if [ ! -d $HOME/$maybe ] ; then
+	continue
+    fi
 
-if [ -z "$(git status | grep 'nothing to commit')" ] ; then
-    echo "Dirty lbne-build/"
-    exit 1
-fi
+    pushd $HOME/$maybe 
 
-if [ -n "$(git status | grep ahead)" ] ; then
-    echo "Need to push lbne-build/"
-    exit 1
-fi
+
+    if [ -z "$(git status | grep 'nothing to commit')" ] ; then
+	echo "Dirty $maybe/"
+	exit 1
+    fi
+
+    if [ -n "$(git status | grep ahead)" ] ; then
+	echo "Need to push $maybe/"
+	exit 1
+    fi
+    popd > /dev/null
+done

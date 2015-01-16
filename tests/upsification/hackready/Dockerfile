@@ -12,6 +12,10 @@ USER lbne
 RUN git config --global user.name "Brett Viren"
 RUN git config --global user.email "bv@bnl.gov"
 
+RUN git clone https://github.com/brettviren/worch.git
+RUN bash -l -c 'cd worch && python setup.py sdist'
+RUN bash -l -c 'pip install worch/dist/worch-*.tar.gz'
+
 RUN git clone https://github.com/brettviren/worch-ups.git
 RUN bash -l -c 'cd worch-ups && python setup.py sdist'
 RUN bash -l -c 'pip install worch-ups/dist/worch-ups-*.tar.gz'
