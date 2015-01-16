@@ -1,7 +1,7 @@
 RUN ls -l install/gcc
-RUN ./install/gcc/4.8.2/bin/gcc --version
-RUN ./install/gcc/4.8.2/bin/g++ --version
+RUN ./install/gcc/4.9.1/bin/gcc --version
+RUN ./install/gcc/4.9.1/bin/g++ --version
 RUN bash -l -c 'urman -z products init'
 RUN bash -l -c 'for n in tmp/upspack/*.tar.bz2 ; do echo $n; tar -C products -xf $n; done'
-RUN bash -l -c 'source products/setups && setup gcc v4_8_2 && gcc --version'
-RUN bash -l -c 'source products/setups && setup gcc v4_8_2 && g++ --version'
+RUN bash -l -c 'source products/setups && setup gcc v4_9_1 && gcc --version'
+RUN bash -l -c 'source products/setups && setup gcc v4_9_1 && g++ --version'

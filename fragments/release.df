@@ -1,2 +1,2 @@
-RUN bash -l -c 'pip install lbne-build=={build}'
+RUN bash -l -c 'pip install git+https://github.com/LBNE/lbne-build.git@{build}'
 RUN cp venv/share/worch/wscripts/lbne/wscript .
