@@ -83,7 +83,7 @@ def workflow_graph(**cfg):
 
     # test nodes
     validate = cfg.get('validate','')
-    for name in split_list(cfg['validate']):
+    for name in split_list(validate):
         iname  = image_name(name)
         tname = iname + '-tested'
         fname = 'fragments/validate_%s.df' % name
