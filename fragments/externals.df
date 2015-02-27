@@ -1,1 +1,2 @@
-RUN bash -l -c 'waf --prefix=install --orch-config=lbne/suite-externals.cfg configure build'
+RUN bash -l -c 'waf --prefix=install --orch-config=lbne/suite-externals.cfg configure build || touch ~/externals.failed'
+RUN bash -c 'test ! -f ~/externals.failed'

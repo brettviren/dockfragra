@@ -1,1 +1,2 @@
-RUN bash -l -c 'waf --prefix=install --orch-config=lbne/suite-buildtools.cfg configure build'
+RUN bash -l -c 'waf --prefix=install --orch-config=lbne/suite-buildtools.cfg configure build || touch ~/buildtools.failed'
+RUN bash -c 'test ! -f ~/buildtools.failed'

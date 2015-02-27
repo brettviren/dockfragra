@@ -1,1 +1,2 @@
-RUN bash -l -c 'waf --prefix=install --orch-config=lbne/suite-larsoft.cfg configure build'
+RUN bash -l -c 'waf --prefix=install --orch-config=lbne/suite-larsoft.cfg configure build || touch ~/larsoft.failed'
+RUN bash -c 'test ! -f ~/larsoft.failed'

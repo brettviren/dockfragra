@@ -1,1 +1,3 @@
-RUN bash -l -c 'waf --prefix=install --orch-config=lbne/suite-compiler.cfg configure build'
+RUN bash -l -c 'waf --prefix=install --orch-config=lbne/suite-compiler.cfg configure build || touch ~/compiler.failed'
+RUN bash -c 'test ! -f ~/compiler.failed'
+

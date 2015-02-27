@@ -39,12 +39,18 @@ Note, it's important, for now, to explicitly install =docker-py= version 0.5.3, 
 
 * Configuration
 
-See [[./graph-docker.cfg]] and the Dockerfile fragments under [[./fragments/]].  More information is in [[./docs/configuration.org]].
+See [[./lbne.cfg]] and the Dockerfile fragments under [[./fragments/]].  More information is in [[./docs/configuration.org]].
 
 * Use
 
 #+BEGIN_EXAMPLE
   $ python graph-docker.py [options] <configuration-section>
+#+END_EXAMPLE
+
+For example:
+
+#+BEGIN_EXAMPLE
+  $ python graph-docker.py -c lbne.cfg lbne-0.7.1-fedora-21-1
 #+END_EXAMPLE
 
 * Areas of ongoing and future work
