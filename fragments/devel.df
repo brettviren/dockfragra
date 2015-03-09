@@ -2,7 +2,6 @@ USER root
 # fixme: move into prereq.df
 RUN yum install -y gitflow
 USER lbne
-
 RUN git config --global user.name "{gituser}"
 RUN git config --global user.email "{gitemail}"
 
