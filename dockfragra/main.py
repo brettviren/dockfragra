@@ -190,8 +190,6 @@ def run_sequence(client, sequence):
               help='Set a user name for the account that will install the software in the container')
 @click.option('--noop', default=False, is_flag=True,
               help='Just print what would happen.')
-@click.option('--ups-products-dir', default=None,
-              help='Set to a directory in the Docker container into which the build results will be installed as UPS products')
 @click.option('--docker-version', default=None,
               help='Set the docker API version to use')
 def doit(config, build, **kwds):
