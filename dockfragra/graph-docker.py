@@ -186,12 +186,14 @@ def run_sequence(client, sequence):
               help='Set identifier of the maintainer')
 @click.option('--docker-url', default='unix://var/run/docker.sock',
               help='Set the URL to the docker daemon')
-@click.option('--install-user', default='lbne',
+@click.option('--install-user', default='user',
               help='Set a user name for the account that will install the software in the container')
 @click.option('--noop', default=False, is_flag=True,
               help='Just print what would happen.')
 @click.option('--ups-products-dir', default=None,
               help='Set to a directory in the Docker container into which the build results will be installed as UPS products')
+@click.option('--docker-version', default=None,
+              help='Set the docker API version to use')
 def doit(config, build, **kwds):
     cfg = parse_config_section(config, build)
     cfg.update(**kwds)
@@ -205,10 +207,13 @@ def doit(config, build, **kwds):
         print_sequence(sequence)
         return
         
-    client = DockerClientWrapper(kwds['docker_url'])
+    client = DockerClientWrapper(kwds['docker_url'], version=kwds['docker_version'])
     run_sequence(client, sequence_graph(graph))
         
 
 
-if '__main__' == __name__:
+def main():
     doit()
+
+if '__main__' == __name__:
+    main()

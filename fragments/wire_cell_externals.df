@@ -1,0 +1,6 @@
+RUN bash -c 'git clone http://root.cern.ch/git/root.git root-src'
+RUN bash -c 'mkdir root-build'
+RUN bash -l -c 'cd root-build && cmake -DCMAKE_INSTALL_PREFIX=$VIRTUAL_ENV -Dpython=ON ../root-src'
+RUN bash -l -c 'cd root-build && make'
+RUN bash -l -c 'cd root-build && make install'
+

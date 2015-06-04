@@ -1,86 +1,31 @@
-Docker for LBNE
+#+TITLE: Docker Fragment Graph
 
-* This Package
-
-This package builds LBNE software stacks starting from nothing, literally.  
-
-It is used to drive Docker through the steps of installing a base-OS, installing all additional required OS-level packages, creating an installation account and, in that, exercising the LBNE build system based on [[https://github.com/brettviren/worch][Worch]] to build compiler, external packages, framework and LBNE experiment software itself.
-
-For some background and rationale for this package, see the wiki page:
-
-#+BEGIN_QUOTE
-https://lbne.bnl.gov/wiki/Building_in_Docker
-#+END_QUOTE
-
-For some design notes/descriptions see [[./docs/big-picture.org]].
-
-Despite "LBNE" in the name, the underlying tool, =graph-docker.py= is general-purpose.  All LBNE-specific parts are kept to the configuration file and the Dockerfile fragments.
+The Docker Fragment Graph (dockfragra) works by driving Docker via its Python API driven by parameterized Dockerfile fragments through a graph (specifically a tree) of way points.
 
 * Installation
 
 ** Docker
 
-See Docker's own installation instructions for your platform for details.  See [[Environment]] for help on possible problems that your particular environment may pose.
+See Docker's own installation instructions for your platform for details.  See the [[./docs/gotchas.org]] for help on possible problems that your particular environment may pose.
 
 ** Python Modules
 
-This package drives Docker via Python but is not yet packaged.  So, for now, you must install things manually.
+This is a Python package and it is recommended to be installed under a Virtual Environment:
 
 #+BEGIN_EXAMPLE
   $ virtualenv venv
   $ source venv/bin/activate
-  $ pip install docker-py=0.5.3
-  $ pip install docker-map
-  $ pip install click
-  $ pip install networkx
+  $ pip install dockfragra
 #+END_EXAMPLE
-
-Note, it's important, for now, to explicitly install =docker-py= version 0.5.3, at least when running on an Ubuntu 14.04 host. It seems that a newer but broken version (0.7) has been uploaded to PyPI.
 
 * Configuration
 
-See [[./lbne.cfg]] and the Dockerfile fragments under [[./fragments/]].  More information is in [[./docs/configuration.org]].
+See [[./examples/]] and the Dockerfile fragments under [[./fragments/]] for examples.  More information is in [[./docs/configuration.org]].
 
 * Use
 
 #+BEGIN_EXAMPLE
-  $ python graph-docker.py [options] <configuration-section>
+  $ dockfragra [options] <configuration-section>
 #+END_EXAMPLE
-
-For example:
-
-#+BEGIN_EXAMPLE
-  $ python graph-docker.py -c lbne.cfg lbne-0.7.1-fedora-21-1
-#+END_EXAMPLE
-
-* Areas of ongoing and future work
-
-- mount directory external to Docker container to "catch" results
-- integrate with Jenkins @ FNAL
-- make use of [[https://hub.docker.com][Docker Hub]] to build containers based on commits to GitHub?
-
-* Environment
-
-In principle, this package should "just work" for all sites since it relies on Docker to abstract away local host issues in a way that should be well tested.  However there are some things that may cause problems:
-
-** Permissions
-
-This package is developed assuming a non-privileged (host) user has permissions to access the Docker daemon.  No testing has been done running with full superuser privileges.
-
-
-** DNS
-
-By default, Docker will try to use Google DNS servers (8.8.8.8).  If your site blocks outbound DNS queries this will cause pretty much everything that uses the network to fail.  To fix this you must instruct the Docker daemon to use your site's DNS server. 
-
-On Debian-based systems do this by editing =/etc/default/docker.io= and adding a =--dns= entry.
-
-** Network proxy
-
-If your local network blocks output HTTP or FTP and requires an explicit proxy then the Docker daemon and the installation procedure that runs inside Docker containers will not be able to download anything.  
-
-To configure the daemon on Debian-based systems, edit =/etc/default/docker.io= and add the usual environment variables that define web proxy URLs (=http_proxy=, etc) and =export= them.  
-
-To configure the container environment, provide a [[./dot.profile]] that sets whatever environment is needed for a user to operate on your network.
-
 
 

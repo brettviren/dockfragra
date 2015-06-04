@@ -1,0 +1,24 @@
+* Environment
+
+In principle, this package should "just work" for all sites since it relies on Docker to abstract away local host issues in a way that should be well tested.  However there are some things that may cause problems:
+
+** Permissions
+
+This package is developed assuming a non-privileged (host) user has permissions to access the Docker daemon.  No testing has been done running with full superuser privileges.
+
+
+** DNS
+
+By default, Docker will try to use Google DNS servers (8.8.8.8).  If your site blocks outbound DNS queries this will cause pretty much everything that uses the network to fail.  To fix this you must instruct the Docker daemon to use your site's DNS server. 
+
+On Debian-based systems do this by editing =/etc/default/docker.io= and adding a =--dns= entry.
+
+** Network proxy
+
+If your local network blocks output HTTP or FTP and requires an explicit proxy then the Docker daemon and the installation procedure that runs inside Docker containers will not be able to download anything.  
+
+To configure the daemon on Debian-based systems, edit =/etc/default/docker.io= and add the usual environment variables that define web proxy URLs (=http_proxy=, etc) and =export= them.  
+
+To configure the container environment, provide a [[./dot.profile]] that sets whatever environment is needed for a user to operate on your network.
+
+

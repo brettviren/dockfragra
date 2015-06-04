@@ -1,0 +1,5 @@
+RUN bash -c 'git clone https://github.com/BNLIF/wire-cell.git'
+RUN bash -c "sed -i 's|git@github.com:|https://github.com/|g' wire-cell/.gitmodules"
+RUN bash -c 'cd wire-cell && git submodule init && git submodule update'
+RUN bash -l -c 'source venv/bin/thisroot.sh && cd wire-cell && ./waf-tools/waf --prefix=$VIRTUAL_ENV configure build install'
+

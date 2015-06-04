@@ -2,3 +2,5 @@
 cut
 venv
 tests/upsification/lbne-docker-test-*
+dist
+*.egg-info
