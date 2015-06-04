@@ -4,5 +4,6 @@ WORKDIR /home/{install_user}
 ENV HOME /home/{install_user}
 RUN rm -f /home/{install_user}/.bash* /home/{install_user}/.profile*
 ADD dot.profile /home/{install_user}/.bash_profile
-RUN curl https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py >ez_setup.py;python ez_setup.py --user;export PATH=$HOME/.local/bin:$PATH;easy_install --user pip;pip install --user virtualenv
+ADD ez_setup.py /home/{install_user}/ez_setup.py
+RUN python ez_setup.py --user;export PATH=$HOME/.local/bin:$PATH;easy_install --user pip;pip install --user virtualenv
 RUN virtualenv venv
