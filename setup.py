@@ -6,6 +6,7 @@ setup(name = 'dockfragra',
       author_email = 'brett.viren@gmail.com',
       license = 'GPLv2',
       url = 'http://github.com/brettviren/dockfragra',
+      packages = ['dockfragra'],
       install_requires=[
           "networkx",
           "click",
